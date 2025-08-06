@@ -1,0 +1,10 @@
+package com.example.StickersMania.repository;
+
+import com.example.StickersMania.entity.Contact;
+import com.example.StickersMania.entity.Product;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+@Repository
+public interface ContactRepository extends JpaRepository<Contact,Long> {
+}
