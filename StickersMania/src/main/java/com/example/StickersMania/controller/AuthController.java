@@ -3,6 +3,7 @@ package com.example.StickersMania.controller;
 import com.example.StickersMania.dto.LoginRequestDto;
 import com.example.StickersMania.dto.LoginResponseDto;
 import com.example.StickersMania.dto.RegisterRequestDto;
+import com.example.StickersMania.dto.UserDto;
 import com.example.StickersMania.entity.Customer;
 import com.example.StickersMania.repository.CustomerRepository;
 import com.example.StickersMania.util.JwtUtil;
@@ -42,18 +43,19 @@ public class AuthController {
     private final JwtUtil jwtUtil;
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponseDto> apiLogin(@RequestBody LoginRequestDto loginRequestDto){
+    public ResponseEntity<LoginResponseDto> apiLogin(@RequestBody
+                                                     LoginRequestDto loginRequestDto) {
         try {
             Authentication authentication = authenticationManager.authenticate(new
                     UsernamePasswordAuthenticationToken(loginRequestDto.username(),
                     loginRequestDto.password()));
-            
-            // Generate JWT token
+            var userDto = new UserDto();
+            var loggedInUser = (User) authentication.getPrincipal();
+            userDto.setName(loggedInUser.getUsername());
             String jwtToken = jwtUtil.generateJwtToken(authentication);
-            
             return ResponseEntity.status(HttpStatus.OK)
-                    .body(new LoginResponseDto(HttpStatus.OK.getReasonPhrase(), null, jwtToken));
-
+                    .body(new LoginResponseDto(HttpStatus.OK.getReasonPhrase(),
+                            userDto, jwtToken));
         } catch (BadCredentialsException ex) {
             return buildErrorResponse(HttpStatus.UNAUTHORIZED,
                     "Invalid username or password");
@@ -64,7 +66,6 @@ public class AuthController {
             return buildErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR,
                     "An unexpected error occurred");
         }
-
     }
 
     @PostMapping("/register")
